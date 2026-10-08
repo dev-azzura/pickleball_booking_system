@@ -10,12 +10,12 @@ class BookingService
 {
     public function getAllBookings()
     {
-        return Booking::all();
+        return Booking::with(['user', 'court'])->get();
     }
 
     public function getBookingById(int $id)
     {
-        return Booking::findOrFail($id);
+        return Booking::with(['user', 'court'])->findOrFail($id);
     }
 
     public function createBooking(array $bookingData)
@@ -35,10 +35,16 @@ class BookingService
 
         $startTime = Carbon::createFromFormat('H:i:s', $bookingData['start_time']);
         $endTime = Carbon::createFromFormat('H:i:s', $bookingData['end_time']);
+        $openingTime = Carbon::createFromFormat('H:i:s', '08:00:00');
+        $closingTime = Carbon::createFromFormat('H:i:s', '22:00:00');
+
+        if ($startTime->lt($openingTime) || $endTime->gt($closingTime)) {
+            throw new \Exception('Booking time must be between 08:00 AM and 10:00 PM.');
+        }
 
         $duration = $startTime->diffInMinutes($endTime) / 60;
 
-       $totalAmount = $court->hourly_rate * $duration;
+        $totalAmount = $court->hourly_rate * $duration;
 
         return Booking::create([
             'user_id' => $bookingData['user_id'],

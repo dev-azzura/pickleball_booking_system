@@ -27,7 +27,22 @@ class BookingRequest extends FormRequest
             'court_id' => 'required|integer|exists:courts,id',
             'booking_date' => 'required|date',
             'start_time' => 'required|date_format:H:i:s',
-            'end_time' => 'required|date_format:H:i:s',
+            'end_time' => [
+                'required',
+                'date_format:H:i:s',
+                'after:start_time',
+            ],
+            // 'start_time' => [
+            //     'required',
+            //     'date_format:H:i:s',
+            //     'after_or_equal:08:00:00',
+            // ],
+            // 'end_time' => [
+            //     'required',
+            //     'date_format:H:i:s',
+            //     'after:start_time',
+            //     'before_or_equal:22:00:00',
+            // ],
         ];
     }
 }
